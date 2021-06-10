@@ -18,7 +18,12 @@ class ScholarlyAbstractBuilder:
                 
     def build(self, dump_data=False, dump_filename=None):
         proceedings = DBLPParser()
-        proceedings_data = proceedings.parse_proceedings(self.DBLP_LINK, self.no_track)
+
+        if self.DBLP_LINK.find("search?q=") != -1:
+            proceedings_data = proceedings.parse_for_query(self.DBLP_LINK)
+            self.TITLE = self.DBLP_LINK.partition("search?q=")[2].replace("%20"," ")
+        else:
+            proceedings_data = proceedings.parse_proceedings(self.DBLP_LINK, self.no_track)
         
         if dump_data==True and dump_filename!=None:
             self.dump_data(proceedings_data, dump_filename+"_DBLP_data")

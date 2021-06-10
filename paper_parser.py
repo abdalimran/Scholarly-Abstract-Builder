@@ -24,7 +24,7 @@ class PaperParser:
                     url = self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url,
                     venue = content['venue'],
                     year = content['year'],
-                    fieldsOfStudy = ", ".join(content['fieldsOfStudy']),
+                    fieldsOfStudy = ", ".join(content['fieldsOfStudy']) if content['fieldsOfStudy']!=None else "No Fields of Study Found",
                     topics = ", ".join([topic['topic'] for topic in content['topics']]),
                     abstract = content['abstract'] if content['abstract']!=None else "No Abstract Found")
         return result

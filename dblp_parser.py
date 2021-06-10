@@ -1,7 +1,10 @@
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import re
 import pickle
+import time
 
 class DBLPParser:
     
@@ -12,6 +15,11 @@ class DBLPParser:
                        "DNT":"1",
                        "Connection":"close", 
                        "Upgrade-Insecure-Requests":"1"}
+
+        self.chrome_options = Options()
+        self.chrome_options.add_argument("--headless")
+        self.driver = webdriver.Chrome(executable_path='./webdriver/chromedriver', options=self.chrome_options)
+    
     
     def proceedings_info(self, paper_dois):
         result = dict(title = paper_dois.find('span', {'class':'title'}).text,
@@ -54,3 +62,30 @@ class DBLPParser:
             print("[%s] Error while parsing!"%response.status_code)
             result = None
         return result
+
+
+    def parse_for_query(self, DBLP_LINK):
+      self.driver.get(DBLP_LINK)
+      lastHeight = self.driver.execute_script("return document.body.scrollHeight")
+      
+      while True:
+          self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+          time.sleep(0.5)
+          newHeight = self.driver.execute_script("return document.body.scrollHeight")
+          if newHeight == lastHeight:
+              break
+          lastHeight = newHeight
+      
+      result = {'proceedings_info': dict(title = DBLP_LINK.partition("search?q=")[2].replace("%20"," "),
+                                         authors = "",
+                                         publisher = "",
+                                         datePublished = "",
+                                         isbn = "")}
+      
+      soup = BeautifulSoup(self.driver.page_source, "html5lib")
+      paper_dois = soup.find_all('ul', attrs={'class': 'publ-list'})
+      
+      result['research'] = set(re.search(r'(?<=doi\.org\/)(.*)',link['href']).group(0)\
+                               for link in paper_dois[0].find_all('a', {'href': re.compile(r'doi\.org/')}))
+      
+      return result
