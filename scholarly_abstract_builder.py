@@ -25,32 +25,37 @@ class ScholarlyAbstractBuilder:
         else:
             proceedings_data = proceedings.parse_proceedings(self.DBLP_LINK, self.no_track)
         
-        if dump_data==True and dump_filename!=None:
+        if dump_data==True and dump_filename!=None and proceedings_data['research']:
             self.dump_data(proceedings_data, dump_filename+"_DBLP_data")
             print("Proceedings metadata has been dumped from DBLP!")            
-        else:
+        elif dump_data==True and dump_filename==None:
             print("'dump_filename' is missing!")
+        else:
+            pass
         
         papers = PaperParser()
         proceedings_book = {}
         
-        for no, track in enumerate(proceedings_data):
-            if no==0:
-                proceedings_book[track] = [proceedings_data[track]]
-            else:
-                proceedings_book[track] = []
-                for doi in proceedings_data[track]:
-                    status_code, paper = papers.parse_doi(doi)
-                    if status_code==200:
-                        proceedings_book[track].append(paper)
-            print('{}. "{}" track DONE!\n'.format(no, track))
+        if proceedings_data['research']:
+            for no, track in enumerate(proceedings_data):
+                if no==0:
+                    proceedings_book[track] = [proceedings_data[track]]
+                else:
+                    proceedings_book[track] = []
+                    for doi in proceedings_data[track]:
+                        status_code, paper = papers.parse_doi(doi)
+                        if status_code==200:
+                            proceedings_book[track].append(paper)
+                print('{}. "{}" track DONE!\n'.format(no, track))
+
+            book_builder = ProceedingsBookBuilder(file_name=self.TITLE)
+            book_builder.build_pdf_book(proceedings_book)
+        else:
+            print("No papers found!")
             
-        if dump_data==True and dump_filename!=None:
+        if dump_data==True and dump_filename!=None and proceedings_data['research']:
             self.dump_data(proceedings_book, dump_filename+"_book_data")
             print("Proceedings book data has been dumped!")
-            
-        book_builder = ProceedingsBookBuilder(file_name=self.TITLE)
-        book_builder.build_pdf_book(proceedings_book)
 
         
 if __name__ == "__main__":

@@ -18,39 +18,112 @@ class PaperParser:
 
 
     def fetch_info(self, content, DOI):
-        result = dict(title = content['title'],
-                    authors = ", ".join([author['name'] for author in content['authors']]),
-                    doi = content['doi'],
-                    url = self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url,
-                    venue = content['venue'],
-                    year = content['year'],
-                    fieldsOfStudy = ", ".join(content['fieldsOfStudy']) if content['fieldsOfStudy']!=None else "No Fields of Study Found",
-                    topics = ", ".join([topic['topic'] for topic in content['topics']]),
-                    abstract = content['abstract'] if content['abstract']!=None else "No Abstract Found")
+        try: title=content['title'];
+        except: title='';
+
+        try: authors=", ".join([author['name'] for author in content['authors']]);
+        except: authors='';
+
+        try: doi=content['doi'];
+        except: doi='';
+
+        try: url=self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url;
+        except: url='';
+
+        try: venue=content['venue'];
+        except: venue='';
+
+        try: year=content['year'];
+        except: year='';
+
+        try: fieldsOfStudy=", ".join(content['fieldsOfStudy']);
+        except: fieldsOfStudy='';
+
+        try: topics=", ".join([topic['topic'] for topic in content['topics']]);
+        except: topics='';
+
+        try: abstract=content['abstract'];
+        except: abstract='';
+        
+        result = dict(title=title, 
+                    authors=authors,
+                    doi=doi,
+                    url=url,
+                    venue=venue,
+                    year=year, 
+                    fieldsOfStudy=fieldsOfStudy,
+                    topics=topics,
+                    abstract=abstract)
+        
         return result
 
 
     def fetch_info_crossref(self, content, DOI, has_abstract=False):
         if has_abstract == False:
-            result = dict(title = content['message']['title'][0],
-                        authors = ", ".join([author['given']+' '+author['family'] for author in content['message']['author']]),
-                        doi = content['message']['DOI'],
-                        url = self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url,
-                        venue = content['message']['short-container-title'][0] if len(content['message']['short-container-title'])!=0 else '-',
-                        year = content['message']['published-print']['date-parts'][0][0],
-                        fieldsOfStudy = "Not Available",
-                        topics = content['message']['link'][0]['intended-application'],
-                        abstract = "No Abstract Found")
+            try: title=content['message']['title'][0];
+            except: title='';
+
+            try: authors=", ".join([author['given']+' '+author['family'] for author in content['message']['author']]);
+            except: authors='';
+
+            try: doi=content['message']['DOI'];
+            except: doi='';
+
+            try: url=self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url;
+            except: url='';
+
+            try: venue=content['message']['short-container-title'][0];
+            except: venue='';
+
+            try: year=content['message']['published-print']['date-parts'][0][0];
+            except: year='';
+
+            try: topics=content['message']['link'][0]['intended-application'];
+            except: topics='';
+
+            result = dict(title=title,
+                        authors=authors,
+                        doi=doi,
+                        url=url,
+                        venue=venue,
+                        year=year,
+                        fieldsOfStudy="",
+                        topics=topics,
+                        abstract="")
         else:
-            result = dict(title = content['message']['items'][0]['title'][0],
-                        authors = ", ".join([author['given']+' '+author['family'] for author in content['message']['items'][0]['author']]),
-                        doi = content['message']['items'][0]['DOI'],
-                        url = self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url,
-                        venue = content['message']['items'][0]['short-container-title'][0],
-                        year = content['message']['items'][0]['published-print']['date-parts'][0][0],
-                        fieldsOfStudy = "Not Available",
-                        topics = content['message']['items'][0]['link'][0]['intended-application'],
-                        abstract = content['message']['items'][0]['abstract'])
+            try: title=content['message']['items'][0]['title'][0];
+            except: title='';
+
+            try: authors=", ".join([author['given']+' '+author['family'] for author in content['message']['items'][0]['author']]);
+            except: authors='';
+
+            try: doi=content['message']['items'][0]['DOI'];
+            except: doi='';
+
+            try: url=self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url;
+            except: url='';
+
+            try: venue=content['message']['items'][0]['short-container-title'][0];
+            except: venue='';
+
+            try: year=content['message']['items'][0]['published-print']['date-parts'][0][0];
+            except: year='';
+
+            try: topics=content['message']['items'][0]['link'][0]['intended-application'];
+            except: topics='';
+
+            try: abstract=content['message']['items'][0]['abstract'];
+            except: abstract='';
+
+            result = dict(title=title,
+                        authors=authors,
+                        doi=doi,
+                        url=url,
+                        venue=venue,
+                        year=year,
+                        fieldsOfStudy="",
+                        topics=topics,
+                        abstract=abstract)
         return result
 
 
