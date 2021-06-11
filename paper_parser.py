@@ -19,31 +19,31 @@ class PaperParser:
 
     def fetch_info(self, content, DOI):
         try: title=content['title'];
-        except: title='';
+        except: title='Not Available';
 
         try: authors=", ".join([author['name'] for author in content['authors']]);
-        except: authors='';
+        except: authors='Not Available';
 
         try: doi=content['doi'];
-        except: doi='';
+        except: doi='Not Available';
 
         try: url=self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url;
-        except: url='';
+        except: url='Not Available';
 
         try: venue=content['venue'];
-        except: venue='';
+        except: venue='Not Available';
 
         try: year=content['year'];
-        except: year='';
+        except: year='Not Available';
 
         try: fieldsOfStudy=", ".join(content['fieldsOfStudy']);
-        except: fieldsOfStudy='';
+        except: fieldsOfStudy='Not Available';
 
         try: topics=", ".join([topic['topic'] for topic in content['topics']]);
-        except: topics='';
+        except: topics='Not Available';
 
         try: abstract=content['abstract'];
-        except: abstract='';
+        except: abstract='Not Available';
         
         result = dict(title=title, 
                     authors=authors,
@@ -61,25 +61,25 @@ class PaperParser:
     def fetch_info_crossref(self, content, DOI, has_abstract=False):
         if has_abstract == False:
             try: title=content['message']['title'][0];
-            except: title='';
+            except: title='Not Available';
 
             try: authors=", ".join([author['given']+' '+author['family'] for author in content['message']['author']]);
-            except: authors='';
+            except: authors='Not Available';
 
             try: doi=content['message']['DOI'];
-            except: doi='';
+            except: doi='Not Available';
 
             try: url=self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url;
-            except: url='';
+            except: url='Not Available';
 
             try: venue=content['message']['short-container-title'][0];
-            except: venue='';
+            except: venue='Not Available';
 
             try: year=content['message']['published-print']['date-parts'][0][0];
-            except: year='';
+            except: year='Not Available';
 
             try: topics=content['message']['link'][0]['intended-application'];
-            except: topics='';
+            except: topics='Not Available';
 
             result = dict(title=title,
                         authors=authors,
@@ -87,33 +87,33 @@ class PaperParser:
                         url=url,
                         venue=venue,
                         year=year,
-                        fieldsOfStudy="",
+                        fieldsOfStudy="Not Available",
                         topics=topics,
-                        abstract="")
+                        abstract="Not Available")
         else:
             try: title=content['message']['items'][0]['title'][0];
-            except: title='';
+            except: title='Not Available';
 
             try: authors=", ".join([author['given']+' '+author['family'] for author in content['message']['items'][0]['author']]);
-            except: authors='';
+            except: authors='Not Available';
 
             try: doi=content['message']['items'][0]['DOI'];
-            except: doi='';
+            except: doi='Not Available';
 
             try: url=self.session.get("https://doi.org/%s"%DOI, allow_redirects=True).url;
-            except: url='';
+            except: url='Not Available';
 
             try: venue=content['message']['items'][0]['short-container-title'][0];
-            except: venue='';
+            except: venue='Not Available';
 
             try: year=content['message']['items'][0]['published-print']['date-parts'][0][0];
-            except: year='';
+            except: year='Not Available';
 
             try: topics=content['message']['items'][0]['link'][0]['intended-application'];
-            except: topics='';
+            except: topics='Not Available';
 
             try: abstract=content['message']['items'][0]['abstract'];
-            except: abstract='';
+            except: abstract='Not Available';
 
             result = dict(title=title,
                         authors=authors,
@@ -121,7 +121,7 @@ class PaperParser:
                         url=url,
                         venue=venue,
                         year=year,
-                        fieldsOfStudy="",
+                        fieldsOfStudy="Not Available",
                         topics=topics,
                         abstract=abstract)
         return result

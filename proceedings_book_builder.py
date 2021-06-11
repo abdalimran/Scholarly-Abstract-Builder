@@ -67,7 +67,8 @@ class ProceedingsBookBuilder:
                 self.cover_pdf(proceedings_data[track][0])
             else:
                 for paper in proceedings_data[track]:
-                    self.paper_pdf(track, paper)
+                    try: self.paper_pdf(track, paper);
+                    except: pass;
                     
         self.proceedings.build(self.flowables, 
                                onFirstPage=self.addPageNumber, 
