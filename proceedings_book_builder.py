@@ -4,11 +4,13 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import PageBreak
 from reportlab.lib.units import inch
+import pandas as pd
 
 class ProceedingsBookBuilder:
     
     def __init__(self, file_name, proceedings_title='Abdullah Al Imran'):
-        self.proceedings = SimpleDocTemplate("%s.pdf"%file_name, pagesize=letter, 
+        self.file_name = file_name
+        self.proceedings = SimpleDocTemplate("%s.pdf"%self.file_name, pagesize=letter, 
                                              rightMargin=72, leftMargin=72, 
                                              topMargin=72, bottomMargin=18)
         self.width, self.height = letter
@@ -75,3 +77,25 @@ class ProceedingsBookBuilder:
                                onLaterPages=self.addPageNumber)
         
         print("Proceedings book has been created!")
+
+    def build_dataset(self, proceedings_data):
+        dataset = pd.DataFrame()
+        for track in proceedings_data.keys():
+            for paper in proceedings_data[track]:
+                    try:
+                        data_dict = {
+                            'title':paper['title'],
+                            'authors':paper['authors'],
+                            'track':track,
+                            'doi':paper['doi'],
+                            'url':paper['url'],
+                            'venue':paper['venue'],
+                            'year':paper['year'],
+                            'fieldsOfStudy':paper['fieldsOfStudy'],
+                            'topics':paper['topics'],
+                            'abstract':paper['abstract']
+                        }
+                        dataset = dataset.append(data_dict, ignore_index=True)
+                    except: pass;
+        return dataset
+        print("Proceedings dataset has been created!")

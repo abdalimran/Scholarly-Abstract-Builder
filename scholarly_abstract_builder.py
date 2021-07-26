@@ -16,7 +16,7 @@ class ScholarlyAbstractBuilder:
         with open("%s.dump"%file_name,'wb') as file:
             pickle.dump(data, file)
                 
-    def build(self, dump_data=False, dump_filename=None):
+    def build(self, dump_data=False, dump_filename=None, makebook=False, makedata=False):
         proceedings = DBLPParser()
 
         if self.DBLP_LINK.find("search?q=") != -1:
@@ -48,8 +48,18 @@ class ScholarlyAbstractBuilder:
                             proceedings_book[track].append(paper)
                 print('{}. "{}" track DONE!\n'.format(no, track))
 
-            book_builder = ProceedingsBookBuilder(file_name=self.TITLE)
-            book_builder.build_pdf_book(proceedings_book)
+            if makebook==True and makedata==True:
+                book_builder = ProceedingsBookBuilder(file_name=self.TITLE)        
+                book_builder.build_pdf_book(proceedings_book)
+                dataset = book_builder.build_dataset(proceedings_book)
+                dataset.to_csv("%s.csv"%self.TITLE, index=False)
+            elif makebook==False and makedata==True:
+                book_builder = ProceedingsBookBuilder(file_name=self.TITLE)
+                dataset = book_builder.build_dataset(proceedings_book)
+                dataset.to_csv("%s.csv"%self.TITLE, index=False)
+            else:
+                book_builder = ProceedingsBookBuilder(file_name=self.TITLE)        
+                book_builder.build_pdf_book(proceedings_book)                
         else:
             print("No papers found!")
             
@@ -64,14 +74,18 @@ if __name__ == "__main__":
     parser.add_argument("--title", "-t", help="set book title")
     parser.add_argument("--notrack", "-nt", help="set track", type=eval, choices=[True, False], default='False')
     parser.add_argument("--dump", "-d", help="set dump data", type=eval, choices=[True, False], default='True')
+    parser.add_argument("--makebook", "-mb", help="set make book", type=eval, choices=[True, False], default='True')
+    parser.add_argument("--makedata", "-md", help="set make data", type=eval, choices=[True, False], default='False')
     args = parser.parse_args()
 
     DBLP_LINK = args.link
     TITLE = args.title
     no_track = args.notrack
+    makebook = args.makebook
+    makedata = args.makedata
 
     builder = ScholarlyAbstractBuilder(DBLP_LINK=DBLP_LINK,
                                        TITLE=TITLE,
                                        no_track=no_track)
 
-    builder.build(dump_data=args.dump, dump_filename=TITLE)
+    builder.build(dump_data=args.dump, dump_filename=TITLE, makebook=makebook, makedata=makedata)
