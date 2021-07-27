@@ -129,27 +129,32 @@ class PaperParser:
 
     def parse_doi(self, DOI):
         print("Parsing for DOI: %s"%DOI, end=" =====> ")
-        response = self.session.get("https://api.semanticscholar.org/v1/paper/%s"%DOI)
-        status_code, content = (response.status_code, json.loads(response.content))
-        
-        if status_code == 200:
-            result = (status_code, self.fetch_info(content, DOI))
-            print("[%s:successful]"%status_code)
-        else:
-            print(["%s:failed"%status_code])
-            print("Trying through crossref", end=" =====> ")
-            response = self.session.get('https://api.crossref.org/works?filter=doi:%s,has-abstract:true'%DOI)
+        try:
+            response = self.session.get("https://api.semanticscholar.org/v1/paper/%s"%DOI)
             status_code, content = (response.status_code, json.loads(response.content))
             
-            if status_code == 200 and len(content['message']['items'])!=0:
-                result = (status_code, self.fetch_info_crossref(content, DOI, has_abstract=True))
-                print("[%s:successful, FOUND WITH ABSTRACT]"%status_code)
-            elif status_code == 200 and len(content['message']['items'])==0:
-                response = self.session.get('https://api.crossref.org/works/%s'%DOI)
-                status_code, content = (response.status_code, json.loads(response.content))
-                result = (status_code, self.fetch_info_crossref(content, DOI, has_abstract=False))
-                print("[%s:successful, FOUND METADATA ONLY]"%status_code)
+            result = (status_code, None)
+
+            if status_code == 200:
+                result = (status_code, self.fetch_info(content, DOI))
+                print("[%s:successful]"%status_code)
             else:
+                print(["%s:failed"%status_code])
+        except:
+            print("Trying through crossref", end=" =====> ")
+            try:
+                response = self.session.get('https://api.crossref.org/works?filter=doi:%s,has-abstract:true'%DOI)
+                status_code, content = (response.status_code, json.loads(response.content))
+                
+                if status_code == 200 and len(content['message']['items'])!=0:
+                    result = (status_code, self.fetch_info_crossref(content, DOI, has_abstract=True))
+                    print("[%s:successful, FOUND WITH ABSTRACT]"%status_code)
+                elif status_code == 200 and len(content['message']['items'])==0:
+                    response = self.session.get('https://api.crossref.org/works/%s'%DOI)
+                    status_code, content = (response.status_code, json.loads(response.content))
+                    result = (status_code, self.fetch_info_crossref(content, DOI, has_abstract=False))
+                    print("[%s:successful, FOUND METADATA ONLY]"%status_code)
+            except:
                 print("[%s:failed]"%status_code)
                 result = (status_code, None)
         return result
