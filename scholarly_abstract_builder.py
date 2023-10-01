@@ -2,7 +2,6 @@ from dblp_parser import DBLPParser
 from paper_parser import PaperParser
 from proceedings_book_builder import ProceedingsBookBuilder
 import pickle
-import time
 import argparse
 
 class ScholarlyAbstractBuilder:

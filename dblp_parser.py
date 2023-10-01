@@ -1,10 +1,10 @@
 import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import Chrome, ChromeOptions
 from bs4 import BeautifulSoup
 import re
 import pickle
 import time
+
 
 class DBLPParser:
     
@@ -16,9 +16,9 @@ class DBLPParser:
                        "Connection":"close", 
                        "Upgrade-Insecure-Requests":"1"}
 
-        self.chrome_options = Options()
-        self.chrome_options.add_argument("--headless")
-        self.driver = webdriver.Chrome(executable_path='./webdriver/chromedriver', options=self.chrome_options)
+        self.chrome_options = ChromeOptions()
+        self.chrome_options.add_argument("--headless=new")
+        self.driver = Chrome(options=self.chrome_options)
     
     
     def proceedings_info(self, paper_dois):
